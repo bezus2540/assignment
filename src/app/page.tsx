@@ -4,11 +4,10 @@ import { User } from "@/types/user";
 import UserForm from "@/components/UserForm";
 import { FileText, ChevronLeft, ChevronRight } from "lucide-react";
 
-// 🔹 แยก utility function (DRY)
+
 const findUserByHN = (users: User[], hn: string) =>
   users.find((u) => u.hn === hn);
 
-// 🔹 แยก pagination logic (Separation of Concerns)
 const paginate = (data: User[], currentPage: number, pageSize: number) => {
   const totalItems = data.length;
   const totalPages = totalItems === 0 ? 1 : Math.ceil(totalItems / pageSize);
@@ -33,14 +32,13 @@ export default function AssignmentPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
-  // 🔹 ใช้ function ที่แยกไว้ (KISS + SoC)
   const { totalItems, totalPages, currentData } = paginate(
     users,
     currentPage,
     pageSize
   );
 
-  // 🔹 Async รองรับ backend ในอนาคต
+  // 🔹 Async เผื่อ backend 
   const handleSave = async (userData: User) => {
     try {
       const exists = findUserByHN(users, userData.hn);
@@ -66,13 +64,16 @@ export default function AssignmentPage() {
       setUsers((prev) => prev.filter((u) => u.hn !== hn));
       setSelectedUser(null);
 
-      // KISS: เขียนให้อ่านง่าย
       if (currentData.length === 1 && currentPage > 1) {
         setCurrentPage((prev) => prev - 1);
       }
     } catch (error) {
       console.error(error);
     }
+  };
+  
+  const handleCancelSelection = () => {
+  setSelectedUser(null);
   };
 
   return (
@@ -122,7 +123,7 @@ export default function AssignmentPage() {
             </tbody>
           </table>
 
-          {/* Pagination */}
+          {/* Pagination คำนวณจำนวนdata */}
           <div className="p-3 flex justify-between items-center border-t text-xs">
             <div>
               Page {currentPage} of {totalPages} ({totalItems} items)
@@ -181,6 +182,7 @@ export default function AssignmentPage() {
           user={selectedUser}
           onSave={handleSave}
           onDelete={handleDelete}
+          onCancel={handleCancelSelection}
         />
       </div>
     </main>
